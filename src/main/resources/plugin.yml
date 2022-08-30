@@ -1,0 +1,4 @@
+name: PermissionPortals
+version: '${project.version}'
+main: me.ogali.permissionportals.PermissionPortals
+api-version: 1.19
