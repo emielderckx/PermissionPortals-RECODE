@@ -14,9 +14,9 @@ public class PlayerJoinListener implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        PortalPlayer portalPlayer = new PortalPlayer(event.getPlayer(), main.getConfig().getBoolean("global.pushback"),
-                0, 0, main.getConfig().getDouble("global.nether-portal-cost"), main.getConfig().getDouble("global.end-portal-cost"));
-        portalPlayer.load(main.getFileHandler().getFile());
+        new PortalPlayer(event.getPlayer(), main.getConfig().getBoolean("global.pushback"),
+                0, 0, main.getConfig().getDouble("global.nether-portal-cost"),
+                main.getConfig().getDouble("global.end-portal-cost")).load(main.getFileHandler().getFile());
     }
 
 }
