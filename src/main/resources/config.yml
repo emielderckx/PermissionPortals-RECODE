@@ -1,0 +1,8 @@
+permissions:
+  nether-portal: nether.portal
+  end-portal: end.portal
+
+messages:
+  no-perms: "&cYou do not have permission to use this portal!"
+  not-enough-money: "&cYou do not have enough money to use this portal!"
+  portal-charge: "&aYou've been charged $&f$portalcost &afor using this portal!"
