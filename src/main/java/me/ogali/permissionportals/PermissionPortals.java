@@ -30,6 +30,7 @@ public final class PermissionPortals extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
+        saveDefaultConfig();
         initializeListeners();
         initializeRegistries();
         initializeCommands();

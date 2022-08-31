@@ -8,17 +8,12 @@ import me.ogali.permissionportals.player.Loadable;
 import me.ogali.permissionportals.player.Saveable;
 import me.ogali.permissionportals.utilities.Chat;
 import net.milkbowl.vault.economy.Economy;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 
 @AllArgsConstructor
 @Setter
@@ -78,7 +73,7 @@ public class PortalPlayer implements Saveable, Loadable {
     }
 
     private boolean doesNotHavePortalCost(boolean netherPortal, double portalCost) {
-        if (PermissionPortals.getInstance().getEconomy().isEmpty()) return true;
+        if (PermissionPortals.getInstance().getEconomy().isEmpty()) return false;
         Economy economy = PermissionPortals.getInstance().getEconomy().get().getProvider();
         if (!economy.has(player, portalCost)) {
             sendDenyMessage(netherPortal, false);
