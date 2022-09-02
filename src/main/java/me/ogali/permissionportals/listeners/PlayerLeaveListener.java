@@ -13,11 +13,7 @@ public class PlayerLeaveListener implements Listener {
 
     @EventHandler
     public void onLeave(PlayerQuitEvent event) {
-        main.getPortalPlayerRegistry().getPortalPlayer(event.getPlayer())
-                .ifPresent(portalPlayer -> {
-                    portalPlayer.save(main.getFileHandler().getFile());
-                    main.getPortalPlayerRegistry().removePortalPlayer(portalPlayer.getPlayer());
-                });
+        main.getPortalPlayerRegistry().removePortalPlayer(event.getPlayer());
     }
 
 }

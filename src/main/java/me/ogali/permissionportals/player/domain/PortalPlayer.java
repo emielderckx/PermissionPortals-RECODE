@@ -1,64 +1,67 @@
 package me.ogali.permissionportals.player.domain;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import me.ogali.permissionportals.PermissionPortals;
-import me.ogali.permissionportals.player.Loadable;
-import me.ogali.permissionportals.player.Saveable;
 import me.ogali.permissionportals.utilities.Chat;
 import net.milkbowl.vault.economy.Economy;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
 import java.util.Objects;
 
-@AllArgsConstructor
 @Setter
 @Getter
-public class PortalPlayer implements Saveable, Loadable {
+public class PortalPlayer {
 
     private final Player player;
     private boolean pushBack;
-    private long netherPortalTimer;
-    private long endPortalTimer;
     private double netherPortalCost;
     private double endPortalCost;
+    private long netherPortalTimer;
+    private long endPortalTimer;
+
+    public PortalPlayer(Player player, boolean pushBack, double netherPortalCost, double endPortalCost) {
+        this.player = player;
+        this.pushBack = pushBack;
+        this.netherPortalCost = netherPortalCost;
+        this.endPortalCost = endPortalCost;
+    }
 
     public void enterPortal(PlayerTeleportEvent event, boolean netherPortal) {
         if (netherPortal) {
-            if (canNotEnterPortal(true, netherPortalCost, "permissions.nether-portal")) {
+            if (canNotEnterPortal(true, getPortalPrice(true), "permissions.nether-portal")) {
                 event.setCancelled(true);
                 pushBack(event);
             }
-            setNetherPortalTimer(System.currentTimeMillis() + 5 * 1000);
+            netherPortalTimer = System.currentTimeMillis() + 5 * 1000;
             return;
         }
-        if (canNotEnterPortal(false, endPortalCost, "permissions.end-portal")) {
+        if (canNotEnterPortal(false, getPortalPrice(false), "permissions.end-portal")) {
             event.setCancelled(true);
             pushBack(event);
         }
-        setEndPortalTimer(System.currentTimeMillis() + 5 * 1000);
+        endPortalTimer = System.currentTimeMillis() + 5 * 1000;
     }
 
-    private void sendDenyMessage(boolean netherPortal, boolean permissionMessage) {
+    private void sendDenyMessage(boolean netherPortal, boolean permissionMessage, double amountOfMoney) {
         if (netherPortal) {
-            if (!(System.currentTimeMillis() > netherPortalTimer)) return;
-            if (permissionMessage) {
-                Chat.tell(player, PermissionPortals.getInstance().getConfig().getString("messages.no-perms"));
-                return;
-            }
-            Chat.tell(player, PermissionPortals.getInstance().getConfig().getString("messages.not-enough-money"));
+            checkTimers(permissionMessage, netherPortalTimer, amountOfMoney, netherPortalCost);
             return;
         }
-        if (!(System.currentTimeMillis() > endPortalTimer)) return;
+        checkTimers(permissionMessage, endPortalTimer, amountOfMoney, endPortalCost);
+    }
+
+    private void checkTimers(boolean permissionMessage, long timer, double amountOfMoney, double portalCost) {
+        if (!(System.currentTimeMillis() > timer)) return;
         if (permissionMessage) {
             Chat.tell(player, PermissionPortals.getInstance().getConfig().getString("messages.no-perms"));
             return;
         }
-        Chat.tell(player, PermissionPortals.getInstance().getConfig().getString("messages.not-enough-money"));
+        Chat.tell(player, Objects.requireNonNull(PermissionPortals.getInstance().getConfig().getString("messages.not-enough-money"))
+                .replace("$portalcost", String.valueOf(portalCost))
+                .replace("$amount-needed", String.valueOf(Math.abs(portalCost - amountOfMoney))));
     }
 
     private void pushBack(PlayerTeleportEvent event) {
@@ -75,11 +78,19 @@ public class PortalPlayer implements Saveable, Loadable {
     private boolean doesNotHavePortalCost(boolean netherPortal, double portalCost) {
         if (PermissionPortals.getInstance().getEconomy().isEmpty()) return false;
         Economy economy = PermissionPortals.getInstance().getEconomy().get().getProvider();
+
+        if (PermissionPortals.getInstance().getConfig().getBoolean("global.one-way-charge")
+                && player.getWorld().getEnvironment() == World.Environment.NETHER) return false;
+
         if (!economy.has(player, portalCost)) {
-            sendDenyMessage(netherPortal, false);
+            sendDenyMessage(netherPortal, false, economy.getBalance(player));
             return true;
         }
+        if (portalCost <= 0) return false;
+
         economy.withdrawPlayer(player, portalCost);
+
+        if (player.hasPermission("permissionportals.ignore-charge-message")) return false;
         Chat.tell(player, Objects.requireNonNull(PermissionPortals.getInstance().getConfig().getString("messages.portal-charge"))
                 .replace("$portalcost", String.valueOf(portalCost)));
         return false;
@@ -87,33 +98,25 @@ public class PortalPlayer implements Saveable, Loadable {
 
     private boolean doesNotHavePermission(boolean netherPortal, String permission) {
         if (!player.hasPermission(Objects.requireNonNull(PermissionPortals.getInstance().getConfig().getString(permission)))) {
-            sendDenyMessage(netherPortal, true);
+            sendDenyMessage(netherPortal, true, 0);
             return true;
         }
         return false;
     }
 
-    @Override
-    public void save(FileConfiguration file) {
-        ConfigurationSection section = file.createSection(player.getUniqueId().toString());
-        section.set("pushback", pushBack);
-        section.set("netherPortalCost", netherPortalCost);
-        section.set("endPortalCost", endPortalCost);
-        PermissionPortals.getInstance().getFileHandler().saveFile();
-    }
-
-    @Override
-    public void load(FileConfiguration file) {
-        ConfigurationSection section = file.getConfigurationSection(player.getUniqueId().toString());
-        if (section == null) {
-            PermissionPortals.getInstance().getPortalPlayerRegistry().addPortalPlayer(this);
-            return;
+    private double getPortalPrice(boolean netherPortal) {
+        if (netherPortal) {
+            if (netherPortalCost == -1) {
+                netherPortalCost = PermissionPortals.getInstance().getConfig().getDouble("global.nether-portal-cost");
+                return netherPortalCost;
+            }
+            return netherPortalCost;
         }
-
-        pushBack = section.getBoolean("pushback");
-        netherPortalCost = section.getDouble("netherPortalCost");
-        endPortalCost = section.getDouble("endPortalCost");
-        PermissionPortals.getInstance().getPortalPlayerRegistry().addPortalPlayer(this);
+        if (endPortalCost == -1) {
+            endPortalCost = PermissionPortals.getInstance().getConfig().getDouble("global.end-portal-cost");
+            return endPortalCost;
+        }
+        return endPortalCost;
     }
 
 }

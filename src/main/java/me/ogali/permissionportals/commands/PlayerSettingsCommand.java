@@ -19,6 +19,7 @@ public class PlayerSettingsCommand implements CommandExecutor {
         if (!label.equalsIgnoreCase("permissionportals")
                 && !label.equalsIgnoreCase("pportals")) return false;
         if (!(sender instanceof Player player)) return false;
+        if (!player.hasPermission("pp.player")) return false;
         if (!(args.length > 0)) {
             Chat.tell(player, "&cUsage: /pportals settings [pushback] [true/false]");
             return false;

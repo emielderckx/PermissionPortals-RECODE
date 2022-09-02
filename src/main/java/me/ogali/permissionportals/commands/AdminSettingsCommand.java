@@ -18,6 +18,7 @@ public class AdminSettingsCommand implements CommandExecutor {
         if (!label.equalsIgnoreCase("pportalsadmin")
                 && !label.equalsIgnoreCase("ppa")) return false;
         if (!(sender instanceof Player player)) return false;
+        if (!player.hasPermission("pp.admin")) return false;
         if (!(args.length > 0)) {
             Chat.tell(player, "&cUsage: /ppa settings [player] [pushback|nether portal cost (npc)|end portal cost (epc)] [value]");
             return false;

@@ -2,7 +2,6 @@ package me.ogali.permissionportals.player;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import me.ogali.permissionportals.PermissionPortals;
 import me.ogali.permissionportals.player.domain.PortalPlayer;
 import org.bukkit.entity.Player;
 
@@ -13,8 +12,6 @@ import java.util.UUID;
 
 @AllArgsConstructor
 public class PortalPlayerRegistry {
-
-    private final PermissionPortals main;
 
     @Getter
     private final Map<UUID, PortalPlayer> portalPlayerMap = new HashMap<>();

@@ -2,6 +2,7 @@ package me.ogali.permissionportals.listeners;
 
 import lombok.AllArgsConstructor;
 import me.ogali.permissionportals.PermissionPortals;
+import me.ogali.permissionportals.utilities.Chat;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerTeleportEvent;
