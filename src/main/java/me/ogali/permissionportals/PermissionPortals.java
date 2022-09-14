@@ -1,8 +1,6 @@
 package me.ogali.permissionportals;
 
 import lombok.Getter;
-import me.ogali.permissionportals.commands.AdminSettingsCommand;
-import me.ogali.permissionportals.commands.PlayerSettingsCommand;
 import me.ogali.permissionportals.listeners.PlayerJoinListener;
 import me.ogali.permissionportals.listeners.PlayerLeaveListener;
 import me.ogali.permissionportals.listeners.PortalEnterListener;
@@ -12,7 +10,6 @@ import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.Objects;
 import java.util.Optional;
 
 public final class PermissionPortals extends JavaPlugin {
@@ -30,7 +27,6 @@ public final class PermissionPortals extends JavaPlugin {
         saveDefaultConfig();
         initializeRegistries();
         initializeListeners();
-        initializeCommands();
     }
 
     public Optional<RegisteredServiceProvider<Economy>> getEconomy() {
@@ -46,11 +42,6 @@ public final class PermissionPortals extends JavaPlugin {
     private void initializeRegistries() {
         portalPlayerRegistry = new PortalPlayerRegistry();
         permissionUtils = new PermissionUtils();
-    }
-
-    private void initializeCommands() {
-        Objects.requireNonNull(getCommand("pportalsadmin")).setExecutor(new AdminSettingsCommand());
-        Objects.requireNonNull(getCommand("permissionportals")).setExecutor(new PlayerSettingsCommand(this));
     }
 
 }
