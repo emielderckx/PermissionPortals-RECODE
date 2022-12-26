@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import me.ogali.permissionportals.PermissionPortals;
 import me.ogali.permissionportals.utilities.Chat;
-import net.milkbowl.vault.economy.Economy;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -76,24 +75,11 @@ public class PortalPlayer {
     }
 
     private boolean doesNotHavePortalCost(boolean netherPortal, double portalCost) {
-        if (PermissionPortals.getInstance().getEconomy().isEmpty()) return false;
-        Economy economy = PermissionPortals.getInstance().getEconomy().get().getProvider();
-
         if (PermissionPortals.getInstance().getConfig().getBoolean("global.one-way-charge")
                 && player.getWorld().getEnvironment() == World.Environment.NETHER) return false;
 
-        if (!economy.has(player, portalCost)) {
-            sendDenyMessage(netherPortal, false, economy.getBalance(player));
-            return true;
-        }
-        if (portalCost <= 0) return false;
-
-        economy.withdrawPlayer(player, portalCost);
-
-        if (player.hasPermission("permissionportals.ignore-charge-message")) return false;
-        Chat.tell(player, Objects.requireNonNull(PermissionPortals.getInstance().getConfig().getString("messages.portal-charge"))
-                .replace("$portalcost", String.valueOf(portalCost)));
         return false;
+
     }
 
     private boolean doesNotHavePermission(boolean netherPortal, String permission) {

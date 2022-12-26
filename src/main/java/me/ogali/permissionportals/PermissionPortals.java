@@ -6,7 +6,6 @@ import me.ogali.permissionportals.listeners.PlayerLeaveListener;
 import me.ogali.permissionportals.listeners.PortalEnterListener;
 import me.ogali.permissionportals.player.PortalPlayerRegistry;
 import me.ogali.permissionportals.utilities.PermissionUtils;
-import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -27,10 +26,6 @@ public final class PermissionPortals extends JavaPlugin {
         saveDefaultConfig();
         initializeRegistries();
         initializeListeners();
-    }
-
-    public Optional<RegisteredServiceProvider<Economy>> getEconomy() {
-        return Optional.ofNullable(getServer().getServicesManager().getRegistration(Economy.class));
     }
 
     private void initializeListeners() {
