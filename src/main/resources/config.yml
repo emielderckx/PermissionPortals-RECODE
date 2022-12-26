@@ -4,7 +4,6 @@ permissions:
 
 messages:
   no-perms: "&cYou do not have permission to use this portal!"
-  not-enough-money: "&cYou do not have enough money to use this portal! &7($amount-needed)"
   portal-charge: "&aYou've been charged &f$$portalcost &afor using this portal!"
 
 global:

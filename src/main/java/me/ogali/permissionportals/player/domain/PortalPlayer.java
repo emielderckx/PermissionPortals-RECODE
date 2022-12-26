@@ -54,13 +54,12 @@ public class PortalPlayer {
 
     private void checkTimers(boolean permissionMessage, long timer, double amountOfMoney, double portalCost) {
         if (!(System.currentTimeMillis() > timer)) return;
-        if (permissionMessage) {
-            Chat.tell(player, PermissionPortals.getInstance().getConfig().getString("messages.no-perms"));
+        String noPermissionMessage = PermissionPortals.getInstance().getConfig().getString("messages.no-perms");
+        if (permissionMessage && !noPermissionMessage.isEmpty()) {
+            Chat.tell(player, noPermissionMessage);
             return;
         }
-        Chat.tell(player, Objects.requireNonNull(PermissionPortals.getInstance().getConfig().getString("messages.not-enough-money"))
-                .replace("$portalcost", String.valueOf(portalCost))
-                .replace("$amount-needed", String.valueOf(Math.abs(portalCost - amountOfMoney))));
+
     }
 
     private void pushBack(PlayerTeleportEvent event) {
